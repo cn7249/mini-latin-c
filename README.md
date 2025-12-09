@@ -20,6 +20,7 @@ Latin C는 다음을 목표로 하는 실험적 컴파일러 프로젝트입니�
 
 ```latin
 Ave Imperator, morituri te salutant.
+```
 
 ### 2. 함수 선언
 프로그램은 하나의 principalis(main) 함수만 가진다:
@@ -28,10 +29,11 @@ Ave Imperator, morituri te salutant.
 integer principalis(vacuum) {
     ...
 }
-
+```
 
 ### 빌드(Build) 및 실행
 
 ```bash
 make
 ./latin-c program.lc
+```
