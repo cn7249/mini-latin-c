@@ -1,24 +1,30 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "ast.h"
 
-extern int yyparse(void);
-extern void run(struct Node *root);
-extern struct Node *yyparse_root;
+int yyparse(void);
+extern FILE *yyin;
+extern int lineno;
+extern AST *yyparse_root;
+void run(AST *root);
 
-int main(int argc, char **argv){
-    if (argc < 2){
-        fprintf(stderr, "usage: %s file.lc\n", argv[0]);
+int main(int argc, char **argv) {
+    if (argc < 2) {
+        printf("usage: %s <file>\n", argv[0]);
         return 1;
     }
-    FILE *f = fopen(argv[1],"r");
-    if (!f){ perror("fopen"); return 1; }
-    extern FILE *yyin;
+    FILE *f = fopen(argv[1], "r");
+    if (!f) {
+        printf("cannot open %s\n", argv[1]);
+        return 1;
+    }
     yyin = f;
-    if (yyparse() != 0){
-        fprintf(stderr, "parse failed\n");
-        return 1;
+    lineno = 1;
+    if (yyparse() == 0) {
+        run(yyparse_root);
+    } else {
+        printf("parse failed\n");
     }
-    if (!yyparse_root){ fprintf(stderr, "no program parsed\n"); return 1; }
-    run(yyparse_root);
+    fclose(f);
     return 0;
 }

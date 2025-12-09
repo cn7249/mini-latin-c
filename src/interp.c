@@ -3,102 +3,131 @@
 #include <string.h>
 #include "ast.h"
 
-/* Very simple symbol table: linked list of (name, int val) */
-typedef struct Sym {
-    char *name; int val; struct Sym *next;
-} Sym;
-static Sym *symtab = NULL;
+typedef struct {
+    char name[128];
+    int value;
+    int used;
+} Var;
 
-void sym_set(const char *name, int v){
-    for (Sym *s = symtab; s; s = s->next){
-        if (strcmp(s->name, name) == 0){ s->val = v; return; }
+static Var vartab[256];
+static int varcount = 0;
+
+static int get_index(const char *name) {
+    for (int i = 0; i < varcount; ++i) {
+        if (strcmp(vartab[i].name, name) == 0) return i;
     }
-    Sym *n = malloc(sizeof(Sym)); n->name = strdup(name); n->val = v; n->next = symtab; symtab = n;
+    return -1;
 }
-int sym_get(const char *name, int *ok){
-    for (Sym *s = symtab; s; s = s->next){
-        if (strcmp(s->name, name) == 0){ *ok = 1; return s->val; }
+
+static int get_var(const char *name, int *ok) {
+    int idx = get_index(name);
+    if (idx < 0) {
+        *ok = 0;
+        return 0;
     }
-    *ok = 0; return 0;
+    *ok = 1;
+    return vartab[idx].value;
 }
 
-/* goal: check that identifiers passed as function arguments are in accusative form:
-   simple rule: identifier ending with "UM" (case-insensitive) is accusative.
-*/
-int is_accusative(const char *name){
-    int L = strlen(name);
-    if (L < 2) return 0;
-    char a = name[L-2], b = name[L-1];
-    a = toupper(a); b = toupper(b);
-    return (a=='U' && b=='M');
-}
-
-int eval(Node *n);
-
-void exec_block(Node *block){
-    Node *cur = block;
-    while(cur){
-        if (cur->kind == N_VARDECL){
-            /* initialize to 0 or given expr */
-            int val = 0;
-            if (cur->left) val = eval(cur->left);
-            sym_set(cur->sval, val);
-        } else if (cur->kind == N_ASSIGN){
-            int v = eval(cur->left);
-            sym_set(cur->sval, v);
-        } else if (cur->kind == N_PRINT){
-            /* For prototype: print format string or a single identifier/int */
-            if (cur->left && cur->left->kind == N_IDENT){
-                /* it's actually a quoted string from lexer with quotes included */
-                char *qs = cur->left->sval;
-                /* remove surrounding quotes if present */
-                if (qs && qs[0] == '"' ){
-                    printf("%s", qs+1);
-                    if (qs[strlen(qs)-1] == '"') printf("\b"); /* noop */
-                } else printf("%s", qs ? qs : "");
-                printf("\n");
-            } else {
-                printf("[print] unsupported format in prototype\n");
-            }
-        } else if (cur->kind == N_RETURN){
-            int rv = eval(cur->left);
-            printf("[return] %d\n", rv);
-        } else if (cur->kind == N_INT){
-            /* expression statement: evaluate and drop */
-            eval(cur);
-        }
-        cur = cur->next;
+static void set_var(const char *name, int v) {
+    int idx = get_index(name);
+    if (idx >= 0) {
+        vartab[idx].value = v;
+        vartab[idx].used = 1;
+        return;
+    }
+    if (varcount < (int)(sizeof(vartab) / sizeof(vartab[0]))) {
+        strncpy(vartab[varcount].name, name, sizeof(vartab[varcount].name) - 1);
+        vartab[varcount].name[sizeof(vartab[varcount].name) - 1] = '\0';
+        vartab[varcount].value = v;
+        vartab[varcount].used = 1;
+        varcount++;
     }
 }
 
-int eval(Node *n){
+static int eval(AST *n);
+
+static int eval_binary(AST *n) {
+    int l = eval(n->left);
+    int r = eval(n->right);
+    int op = n->ival;
+    if (op == '+') return l + r;
+    if (op == '-') return l - r;
+    if (op == '*') return l * r;
+    if (op == '/') return r ? l / r : 0;
+    return 0;
+}
+
+static int eval(AST *n) {
     if (!n) return 0;
-    switch(n->kind){
-        case N_INT: return n->ival;
+    switch (n->kind) {
+        case N_INT:
+            return n->ival;
+        case N_STRING:
+            return 0;
         case N_IDENT: {
-            int ok; int v = sym_get(n->sval, &ok);
-            if (!ok){ fprintf(stderr, "Runtime error: undefined variable %s\n", n->sval); return 0; }
+            int ok;
+            int v = get_var(n->sval, &ok);
+            if (!ok) {
+                fprintf(stderr, "runtime: undefined var %s\n", n->sval);
+                return 0;
+            }
             return v;
         }
-        case N_BINARY: {
-            int l = eval(n->left);
-            int r = eval(n->right);
-            if (n->ival == '*') return l * r;
-            if (n->ival == '+') return l + r;
+        case N_VARDECL: {
+            if (n->left) {
+                int v = eval(n->left);
+                set_var(n->sval, v);
+                return v;
+            } else {
+                set_var(n->sval, 0);
+                return 0;
+            }
+        }
+        case N_ASSIGN: {
+            int v = eval(n->left);
+            set_var(n->sval, v);
+            return v;
+        }
+        case N_BINARY:
+            return eval_binary(n);
+        case N_PRINT: {
+            if (n->left) {
+                if (n->left->kind == N_STRING) {
+                    printf("%s\n", n->left->sval);
+                } else {
+                    printf("%d\n", eval(n->left));
+                }
+            }
             return 0;
         }
+        case N_RETURN:
+            return eval(n->left);
         default:
             return 0;
     }
 }
 
-/* top-level run */
-void run(Node *root){
-    if (!root) { fprintf(stderr, "No AST\n"); return; }
-    if (root->kind == N_FUNC){
-        printf("[run] executing function %s\n", root->sval);
-        exec_block(root->left);
-    } else {
-        fprintf(stderr, "Unexpected top node\n");
+static void exec_stmt_list(AST *list) {
+    AST *cur = list;
+    while (cur) {
+        if (cur->kind == N_RETURN) return;
+        if (cur->kind == N_FUNC) {
+            cur = cur->next;
+            continue;
+        }
+        eval(cur);
+        cur = cur->next;
+    }
+}
+
+void run(AST *root) {
+    if (!root) return;
+    if (root->kind == N_FUNC) {
+        exec_stmt_list(root->left);
+        return;
+    }
+    if (root->kind == N_STMT_LIST) {
+        exec_stmt_list(root);
     }
 }

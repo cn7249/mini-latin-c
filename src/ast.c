@@ -3,44 +3,92 @@
 #include <stdio.h>
 #include "ast.h"
 
-struct Node {
-    enum { N_PROGRAM, N_FUNC, N_BLOCK, N_VARDECL, N_ASSIGN, N_INT, N_IDENT, N_BINARY, N_CALL, N_RETURN, N_PRINT } kind;
-    int ival;
-    char *sval;
-    struct Node *left;
-    struct Node *right;
-    struct Node *next;
-    struct Node *args;
-};
+AST *yyparse_root = NULL;
 
-Node *yyparse_root = NULL;
-
-Node *make_node(){
-    Node *n = malloc(sizeof(Node));
-    n->kind = N_INT; n->ival = 0; n->sval = NULL; n->left = n->right = n->next = n->args = NULL;
+static AST *alloc_node(void) {
+    AST *n = (AST *)malloc(sizeof(AST));
+    if (!n) {
+        fprintf(stderr, "out of memory\n");
+        exit(1);
+    }
+    n->kind = N_INT;
+    n->ival = 0;
+    n->sval = NULL;
+    n->left = NULL;
+    n->right = NULL;
+    n->next = NULL;
     return n;
 }
-Node *make_int(int v){
-    Node *n = make_node(); n->kind = N_INT; n->ival = v; return n;
+
+AST *make_node(void) {
+    return alloc_node();
 }
-Node *make_ident(char *s){
-    Node *n = make_node(); n->kind = N_IDENT; n->sval = strdup(s); return n;
+
+AST *make_int(int v) {
+    AST *n = alloc_node();
+    n->kind = N_INT;
+    n->ival = v;
+    return n;
 }
-Node *make_vardecl(char *name, Node *init){
-    Node *n = make_node(); n->kind = N_VARDECL; n->sval = strdup(name); n->left = init; return n;
+
+AST *make_string(char *s) {
+    AST *n = alloc_node();
+    n->kind = N_STRING;
+    n->sval = strdup(s);
+    return n;
 }
-Node *make_assign(char *name, Node *expr){
-    Node *n = make_node(); n->kind = N_ASSIGN; n->sval = strdup(name); n->left = expr; return n;
+
+AST *make_ident(char *s) {
+    AST *n = alloc_node();
+    n->kind = N_IDENT;
+    n->sval = strdup(s);
+    return n;
 }
-Node *make_binary(Node *l, int op, Node *r){
-    Node *n = make_node(); n->kind = N_BINARY; n->ival = op; n->left = l; n->right = r; return n;
+
+AST *make_vardecl(char *name, AST *init) {
+    AST *n = alloc_node();
+    n->kind = N_VARDECL;
+    n->sval = strdup(name);
+    n->left = init;
+    return n;
 }
-Node *make_print(Node *fmt, Node *args){
-    Node *n = make_node(); n->kind = N_PRINT; n->left = fmt; n->args = args; return n;
+
+AST *make_assign(char *name, AST *expr) {
+    AST *n = alloc_node();
+    n->kind = N_ASSIGN;
+    n->sval = strdup(name);
+    n->left = expr;
+    return n;
 }
-Node *make_func(char *name, Node *body){
-    Node *n = make_node(); n->kind = N_FUNC; n->sval = strdup(name); n->left = body; return n;
+
+AST *make_binary(AST *l, int op, AST *r) {
+    AST *n = alloc_node();
+    n->kind = N_BINARY;
+    n->ival = op;
+    n->left = l;
+    n->right = r;
+    return n;
 }
-Node *make_return(Node *expr){
-    Node *n = make_node(); n->kind = N_RETURN; n->left = expr; return n;
+
+AST *make_print(AST *fmt, AST *args) {
+    AST *n = alloc_node();
+    n->kind = N_PRINT;
+    n->left = fmt;
+    n->right = args;
+    return n;
+}
+
+AST *make_return(AST *expr) {
+    AST *n = alloc_node();
+    n->kind = N_RETURN;
+    n->left = expr;
+    return n;
+}
+
+AST *make_func(char *name, AST *body) {
+    AST *n = alloc_node();
+    n->kind = N_FUNC;
+    n->sval = strdup(name);
+    n->left = body;
+    return n;
 }

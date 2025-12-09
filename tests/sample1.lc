@@ -1,15 +1,14 @@
 Ave Imperator, morituri te salutant.
 
-integer principalis (vacuum)
+integer principalis(vacuum)
 {
     integer MARCUS;
-    integer LUCIUS;
+    integer LUCIUS EST X;
 
-    MARCUS EST II;
+    MARCUS EST V;
 
-    /* for/while 단순화 - 현재 프로토타입은 for 문을 완전히 파싱하지 않을 수 있음.
-       우선 변수 선언/대입/print/return 흐름 확인 */
-    scribere("MARCUS is set");
-    
-    reditus 0;
+    scribere("MARCUS est V");
+    scribere("LUCIUS est X");
+
+    reditus MARCUS + LUCIUS;
 }
