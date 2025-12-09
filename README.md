@@ -204,3 +204,41 @@ make
 ### Test 1 - 기본 출력
 
 
+## 8. 프로젝트 구조
+```
+src/
+  lexer.l
+  parser.y
+  ast.c
+  ast.h
+  interp.c
+  main.c
+Makefile
+README.md
+```
+
+## 9. 구현된 기능 / 미구현 기능
+### 구현된 기능
+- 변수 선언 및 대입
+- 산술 연산(+, *)
+- 비교 연산(PAR, IMPAR, MINOR, MAIOR, NON_MAIOR, NON_MINOR)
+- 논리 연산(ET, VEL, NON)
+- 문자열 출력
+- 로마 숫자 해석기
+- 라틴식 주석(NOTA:, EXPLANATIO: ... FINIS)
+- AST 기반 인터프리터
+- 기본 에러 메시지 출력
+
+---
+### 미구현(향후 확장 예정)
+- 조건문(if, else)
+- 반복문(while, for)
+- 함수 호출(사용자 정의 함수)
+- 타입 검사
+- 에러 복구 처리
+
+---
+
+## 10. 개발자
+najdorf / cn7249
+cn7249@gmail.com
