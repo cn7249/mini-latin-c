@@ -1,0 +1,14 @@
+# Build outputs
+build/
+*.o
+*.exe
+*.out
+
+# Flex/Bison generated files
+parser.tab.c
+parser.tab.h
+lex.yy.c
+
+# macOS / Windows junk
+.DS_Store
+Thumbs.db
