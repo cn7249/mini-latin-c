@@ -201,7 +201,290 @@ make
 ---
 
 ## 7. 테스트 프로그램 10개 (기대 출력 포함)
-### Test 1 - 기본 출력
+### 예제 1 - 변수 선언 & 기본 출력
+**sample01.lc**
+```latin
+Ave Imperator, morituri te salutant.
+
+integer principalis(vacuum)
+{
+    integer MARCUS EST X;
+    integer LUCIUS EST V;
+
+    scribere(MARCUS);
+    scribere(LUCIUS);
+
+    reditus 0;
+}
+```
+
+**Output**
+```
+10
+5
+```
+
+---
+
+### 예제 2 - 산술 연산 (+, *)
+**sample02.lc**
+```latin
+Ave Imperator, morituri te salutant.
+
+integer principalis(vacuum)
+{
+    integer A EST V;
+    integer B EST X;
+
+    scribere(A + B);
+    scribere(A * B);
+
+    reditus 0;
+}
+
+```
+
+**Output**
+```
+15
+50
+```
+
+---
+
+### 예제 3 - 비교 연산 (PAR, IMPAR)
+**sample03.lc**
+```latin
+Ave Imperator, morituri te salutant.
+
+integer principalis(vacuum)
+{
+    integer A EST X;
+    integer B EST V;
+
+    scribere(A PAR B);
+    scribere(A IMPAR B);
+
+    reditus 0;
+}
+```
+
+**Output**
+```
+0
+1
+```
+
+---
+
+### 예제 4 - 비교 연산 (MINOR, MAIOR, NON_MINOR, NON_MAIOR)
+**sample04.lc**
+```latin
+Ave Imperator, morituri te salutant.
+
+integer principalis(vacuum)
+{
+    integer A EST V;
+    integer B EST X;
+
+    scribere(A MINOR B);
+    scribere(A MAIOR B);
+    scribere(A NON_MINOR B);
+    scribere(A NON_MAIOR B);
+
+    reditus 0;
+}
+
+```
+
+**Output**
+```
+1
+0
+0
+1
+
+```
+
+---
+
+### 예제 5 - 논리 연산 (ET, VEL, NON)
+**sample05.lc**
+```latin
+Ave Imperator, morituri te salutant.
+
+integer principalis(vacuum)
+{
+    integer A EST X;
+    integer B EST V;
+
+    scribere((A MAIOR B) ET (B MINOR X));
+    scribere((A MINOR B) VEL (B PAR V));
+    scribere(NON (A PAR B));
+
+    reditus 0;
+}
+
+```
+
+**Output**
+```
+1
+1
+1
+```
+
+---
+
+### 예제 6 - 문자열 출력(string)
+**sample06.lc**
+```latin
+Ave Imperator, morituri te salutant.
+
+integer principalis(vacuum)
+{
+    scribere("SALVE MUNDUS");
+    scribere("VALDE BENE!");
+
+    reditus 0;
+}
+
+```
+
+**Output**
+```
+SALVE MUNDUS
+VALDE BENE!
+```
+
+---
+
+### 예제 7 - 중첩된 표현식
+**sample07.lc**
+```latin
+Ave Imperator, morituri te salutant.
+
+integer principalis(vacuum)
+{
+    integer A EST X;
+    integer B EST V;
+
+    scribere((A + B) * (A MAIOR B));
+
+    reditus 0;
+}
+
+```
+
+**Output**
+```
+15
+```
+
+---
+
+### 예제 8 - 단일줄 주석 (NOTA:)
+**sample08.lc**
+```latin
+Ave Imperator, morituri te salutant.
+
+integer principalis(vacuum)
+{
+    NOTA: this line should be ignored
+
+    integer A EST X;
+
+    scribere(A);
+
+    reditus 0;
+}
+
+```
+
+**Output**
+```
+10
+```
+
+---
+
+### 예제 9 - 코드 블럭 주석 (EXPLANATIO: ... FINIS)
+**sample09.lc**
+```latin
+Ave Imperator, morituri te salutant.
+
+integer principalis(vacuum)
+{
+    EXPLANATIO:
+        nothing inside this block should be executed
+        integer A EST V;
+        scribere(A);
+    FINIS
+
+    integer B EST X;
+    scribere(B);
+
+    reditus 0;
+}
+
+```
+
+**Output**
+```
+10
+```
+
+---
+
+### 예제 10 - 종합 테스트 (모든 기능 사용)
+**sample10.lc**
+```latin
+Ave Imperator, morituri te salutant.
+
+integer principalis(vacuum)
+{
+    integer A EST X;
+    integer B EST V;
+
+    NOTA: simple computation
+    scribere(A + B);
+
+    scribere(A PAR B);
+    scribere(A IMPAR B);
+
+    scribere(A MAIOR B);
+    scribere(A NON_MAIOR B);
+
+    scribere((A MAIOR B) ET (B PAR V));
+    scribere((A MINOR B) VEL (A PAR V));
+
+    scribere(NON (A PAR B));
+
+    EXPLANATIO:
+    this should be ignored.
+    I love compiler class.
+    FINIS
+
+    reditus 0;
+}
+
+```
+
+**Output**
+```
+
+```
+15
+0
+1
+1
+0
+1
+0
+1
+
+---
+
 
 
 ## 8. 프로젝트 구조
