@@ -5,7 +5,12 @@ integer principalis(vacuum)
     integer MARCUS;
     integer LUCIUS EST X;
 
-    NOTA! 주석 테스트, bla bla;;.
+    NOTA: 주석 테스트, bla bla;;.
+
+    EXPLANATIO:
+    여기는 주석이다.
+    scribere("안 보인다");
+    FINIS
 
     MARCUS EST V;
 

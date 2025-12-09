@@ -16,9 +16,16 @@ int roman_val(char c);
 int roman_to_int(const char *s);
 %}
 
+%x COMMENT
+
 %%
 
-"NOTA!"[^\n]*      ;
+"EXPLANATIO:"       { BEGIN(COMMENT); }
+<COMMENT>"FINIS"    { BEGIN(INITIAL); }
+<COMMENT>\n         { lineno++; }
+<COMMENT>.          ;
+
+"NOTA:"[^\n]*      ;
 
 \n                  { lineno++; }
 [ \t\r]+            ;
