@@ -41,11 +41,6 @@ int roman_to_int(const char *s);
 
 [0-9]+              { yylval.intval = atoi(yytext); return T_NUMBER; }
 
-[a-zA-Z_][a-zA-Z0-9_]* {
-                        yylval.str = strdup(yytext);
-                        return T_IDENT;
-                     }
-
 "("                 { return '('; }
 ")"                 { return ')'; }
 "{"                 { return '{'; }
@@ -53,17 +48,25 @@ int roman_to_int(const char *s);
 ";"                 { return ';'; }
 ","                 { return ','; }
 
-"=="        { return T_EQ; }
-"!="        { return T_NE; }
-"<="        { return T_LE; }
-">="        { return T_GE; }
-"<"         { return T_LT; }
-">"         { return T_GT; }
+PAR         { return T_EQ; }
+IMPAR       { return T_NE; }
 
-"&&"        { return T_AND; }
-"||"        { return T_OR; }
-"!"         { return T_NOT; }
+NON_MAIOR   { return T_LE; }
+NON_MINOR   { return T_GE; }
 
+MINOR       { return T_LT; }
+MAIOR       { return T_GT; }
+
+ET          { return T_AND; }
+VEL         { return T_OR; }
+
+NON         { return T_NOT; }
+
+
+[a-zA-Z_][a-zA-Z0-9_]* {
+                        yylval.str = strdup(yytext);
+                        return T_IDENT;
+                     }
 
 .                   {
         if (DEBUG_LEX) printf("[LEX] Unknown char: %c\n", yytext[0]);

@@ -5,16 +5,16 @@ integer principalis(vacuum)
     integer A EST X;
     integer B EST V;
 
-    scribere(A == B);
-    scribere(A != B);
-    scribere(A > B);
-    scribere(A >= B);
-    scribere(A < B);
-    scribere(A <= B);
+    scribere(A PAR B);
+    scribere(A IMPAR B);
+    scribere(A MAIOR B);
+    scribere(A NON_MINOR B);
+    scribere(A MINOR B);
+    scribere(A NON_MAIOR B);
 
-    scribere((A > B) && (B == V));
-    scribere((A < B) || (B == X));
-    scribere(! (A == B));
+    scribere((A MAIOR B) ET (B PAR V));
+    scribere((A MINOR B) VEL (B PAR X));
+    scribere(NON (A PAR B));
 
     reditus 0;
 }
