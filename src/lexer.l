@@ -18,6 +18,8 @@ int roman_to_int(const char *s);
 
 %%
 
+"//"[^\n]*      ;
+
 \n                  { lineno++; }
 [ \t\r]+            ;
 

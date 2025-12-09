@@ -5,6 +5,8 @@ integer principalis(vacuum)
     integer MARCUS;
     integer LUCIUS EST X;
 
+    // 주석 테스트, bla bla;;.
+
     MARCUS EST V;
 
     scribere("MARCUS est V");
