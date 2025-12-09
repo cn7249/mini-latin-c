@@ -5,6 +5,8 @@ Latin C는 mini-C 형태의 간단한 언어를 기반으로 하되,
 
 본 프로젝트는 Flex/Bison을 통해 직접 제작한 Lexer/Parser를 활용하며, AST(Abstract Syntax Tree)를 구성하여 인터프리터가 실행하도록 설계하였습니다.
 
+---
+
 ## 1. 프로젝트 개요
 - 개발 목표: 고전 라틴어 기반의 독창적인 DSL(도메인 특화 언어) 제작
 - 실행 구조: **Lexer -> Parser -> AST -> Interpreter**
@@ -14,6 +16,8 @@ Latin C는 mini-C 형태의 간단한 언어를 기반으로 하되,
   - 라틴식 단일, 다중 주석 지원
   - main 함수에 해당하는 ```principalis``` 사용
   - 프로그램 시작을 알리는 필수 구문 존재
+
+---
 
 ## 2. 언어 특징
 ### 필수 프롤로그(Preamble)
@@ -26,33 +30,18 @@ Ave Imperator, morituri te salutant.
 
 이는 일반 C의 ```#include <stdio.h>```역할을 대신합니다.
 
+---
+
 ### 데이터 타입
 | 라틴어       | 의미               |
 | --------- | ---------------- |
 | `integer` | 정수형 타입           |
 | `vacuum`  | 파라미터 없음(VOID 역할) |
 
+---
 
-
-
-
-
-
-
-
-### 라틴어 기반 키워드
-
-## 지원되는 기능
-
-### 1. **프롤로그(Preamble)**
-모든 프로그램은 반드시 아래 문장으로 시작해야 한다:
-
-```latin
-Ave Imperator, morituri te salutant.
-```
-
-### 2. 함수 선언
-프로그램은 하나의 principalis(main) 함수만 가진다:
+### 함수(Function)
+Latic C 프로그램은 반드시 하나의 주 함수인 ```principalis```를 포함해야 합니다.
 
 ```latin
 integer principalis(vacuum) {
@@ -60,9 +49,158 @@ integer principalis(vacuum) {
 }
 ```
 
-### 빌드(Build) 및 실행
+---
 
+### 변수 선언 및 대입
+
+```latin
+integer MARCUS;
+integer LUCIUS EST X;    NOTA: X는 로마 숫자 10
+MARCUS EST V;            NOTA: V는 로마 숫자 5
+```
+
+대입에는 반드시 **EST** 키워드를 사용합니다.
+
+### 로마 숫자 지원
+다음과 같은 표준 로마 숫자를 모두 지원합니다.
+```
+I, V, X, L, C, D, M, IV, IX, XL, XC, CD, CM ...
+```
+
+예시:
+| 로마 숫자 | 값    |
+| ----- | ---- |
+| X     | 10   |
+| IV    | 4    |
+| MCMXC | 1990 |
+
+---
+
+### 출력 (scribere)
+```latin
+scribere("Salve!");
+scribere(A);
+scribere(A PAR B);
+```
+문자열은 자동으로 따옴표 제거 후 출력됩니다.
+
+---
+
+## 3. 주석(Comment) 시스템
+### 단일 라인 주석
+```latin
+NOTA: 이 줄 전체는 무시됩니다.
+```
+
+---
+
+### 멀티 라인 주석(코드 블록)
+```latin
+EXPLANATIO:
+  이 영역은 전체가 무시됩니다.
+  여러 줄도 가능합니다.
+FINIS
+```
+
+---
+
+## 4. 지원되는 연산자 (Operators)
+### 산술 연산자
+| 의미 | 기호  |
+| -- | --- |
+| 덧셈 | `+` |
+| 곱셈 | `*` |
+
+---
+
+### 비교 연산자 (라틴어 키워드)
+| 의미     | 원래 기호 | 라틴어 키워드       |
+| ------ | ----- | ------------- |
+| 같다     | ==    | **PAR**       |
+| 다르다    | !=    | **IMPAR**     |
+| 작다     | <     | **MINOR**     |
+| 크다     | >     | **MAIOR**     |
+| 작거나 같다 | <=    | **NON_MAIOR** |
+| 크거나 같다 | >=    | **NON_MINOR** |
+
+사용 예시:
+```latin
+scribere(A PAR B);
+scribere(A MAIOR B);
+scribere(A NON_MAIOR B);
+```
+
+---
+
+### 논리 연산자
+| 의미  | 기호 | 라틴어 키워드 |
+| --- | -- | ------- |
+| AND | && | **ET**  |
+| OR  | || | **VEL** |
+| NOT | !  | **NON** |
+
+사용 예시
+```latin
+scribere((A MAIOR B) ET (B PAR V));
+scribere(NON(A PAR B));
+```
+
+---
+
+## 5. 언어 문법(EBNF)
+```ebnf
+program        = preamble func_decl ;
+
+preamble       = "Ave Imperator, morituri te salutant." ;
+
+func_decl      = "integer" IDENT "(" "vacuum" ")" block ;
+
+block          = "{" stmt_list "}" ;
+
+stmt_list      = { stmt } ;
+
+stmt           = var_decl ";"
+               | IDENT "EST" expr ";"
+               | "scribere" "(" expr ")" ";"
+               | "reditus" expr ";"
+               | expr ";" ;
+
+var_decl       = "integer" IDENT
+               | "integer" IDENT "EST" expr ;
+
+expr           = NUMBER
+               | STRING
+               | IDENT
+               | expr "+" expr
+               | expr "*" expr
+               | "(" expr ")"
+               | expr PAR expr
+               | expr IMPAR expr
+               | expr MINOR expr
+               | expr MAIOR expr
+               | expr NON_MAIOR expr
+               | expr NON_MINOR expr
+               | expr ET expr
+               | expr VEL expr
+               | NON expr ;
+```
+
+---
+
+## 6. 빌드 및 실행 방법
+### 빌드
 ```bash
 make
+```
+
+### 실행
+```bash
 ./latin-c program.lc
 ```
+
+---
+
+## 7. 테스트 프로그램 10개 (기대 출력 포함)
+### Test 1 - 기본 출력
+
+
