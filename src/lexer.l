@@ -53,6 +53,18 @@ int roman_to_int(const char *s);
 ";"                 { return ';'; }
 ","                 { return ','; }
 
+"=="        { return T_EQ; }
+"!="        { return T_NE; }
+"<="        { return T_LE; }
+">="        { return T_GE; }
+"<"         { return T_LT; }
+">"         { return T_GT; }
+
+"&&"        { return T_AND; }
+"||"        { return T_OR; }
+"!"         { return T_NOT; }
+
+
 .                   {
         if (DEBUG_LEX) printf("[LEX] Unknown char: %c\n", yytext[0]);
         return yytext[0];

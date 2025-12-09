@@ -74,6 +74,33 @@ static void eval_string(AST *n) {
     }
 }
 
+static int eval_compare(AST *n) {
+    int l = eval(n->left);
+    int r = eval(n->right);
+    switch (n->ival) {
+        case CMP_EQ: return l == r;
+        case CMP_NE: return l != r;
+        case CMP_LT: return l < r;
+        case CMP_GT: return l > r;
+        case CMP_LE: return l <= r;
+        case CMP_GE: return l >= r;
+    }
+    return 0;
+}
+
+static int eval_logic(AST *n) {
+    switch (n->ival) {
+        case LOG_AND:
+            return eval(n->left) && eval(n->right);
+        case LOG_OR:
+            return eval(n->left) || eval(n->right);
+        case LOG_NOT:
+            return !eval(n->left);
+    }
+    return 0;
+}
+
+
 static int eval(AST *n) {
     if (!n) return 0;
 
@@ -111,9 +138,15 @@ static int eval(AST *n) {
             set_var(n->sval, v);
             return v;
         }
-
+        
         case N_BINARY:
             return eval_binary(n);
+
+        case N_COMPARE:
+            return eval_compare(n);
+
+        case N_LOGIC:
+            return eval_logic(n);
 
         case N_PRINT: {
             if (n->left) {

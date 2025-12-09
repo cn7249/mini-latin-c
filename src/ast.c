@@ -92,3 +92,21 @@ AST *make_func(char *name, AST *body) {
     n->left = body;
     return n;
 }
+
+AST *make_compare(int op, AST *left, AST *right) {
+    AST *n = make_node();
+    n->kind = N_COMPARE;
+    n->ival = op;
+    n->left = left;
+    n->right = right;
+    return n;
+}
+
+AST *make_logic(int op, AST *left, AST *right) {
+    AST *n = make_node();
+    n->kind = N_LOGIC;
+    n->ival = op;
+    n->left = left;
+    n->right = right;
+    return n;
+}
