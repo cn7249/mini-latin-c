@@ -5,10 +5,12 @@
 int yyparse(void);
 extern FILE *yyin;
 extern int lineno;
+extern int yydebug;
 extern AST *yyparse_root;
 void run(AST *root);
 
 int main(int argc, char **argv) {
+    yydebug = 1;
     if (argc < 2) {
         printf("usage: %s <file>\n", argv[0]);
         return 1;

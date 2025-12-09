@@ -1,11 +1,14 @@
+%debug
+%define parse.error verbose
+
 %{
 #include <stdio.h>
 #include <stdlib.h>
 #include "ast.h"
 
 void yyerror(const char *s);
+#undef yylex
 int yylex(void);
-
 int lineno = 1;
 %}
 
@@ -16,7 +19,8 @@ int lineno = 1;
 }
 
 %token T_PREAMBLE
-%token T_INTEGER T_VOID
+%token T_INTEGER
+%token T_VOID
 %token T_PRINT
 %token T_ASSIGN
 %token T_RETURN
@@ -38,7 +42,7 @@ int lineno = 1;
 program:
     T_PREAMBLE func_decl
     {
-        yyparse_root = (AST*)$2;
+        yyparse_root = $2;
         $$ = $2;
     }
     ;
@@ -46,7 +50,7 @@ program:
 func_decl:
     T_INTEGER T_IDENT '(' T_VOID ')' block
     {
-        $$ = make_func($2, (AST*)$6);
+        $$ = make_func($2, $6);
     }
     ;
 
@@ -58,7 +62,6 @@ block:
     ;
 
 stmt_list:
-      /* empty */
     {
         $$ = NULL;
     }
@@ -67,9 +70,9 @@ stmt_list:
         if ($1 == NULL)
             $$ = $2;
         else {
-            AST *cur = (AST*)$1;
-            while (cur->next) cur = cur->next;
-            cur->next = (AST*)$2;
+            void *cur = $1;
+            while (((AST*)cur)->next) cur = ((AST*)cur)->next;
+            ((AST*)cur)->next = $2;
             $$ = $1;
         }
     }
@@ -80,34 +83,31 @@ stmt:
     {
         $$ = $1;
     }
-    | T_IDENT T_ASSIGN expr ';'
+  | T_IDENT T_ASSIGN expr ';'
     {
         $$ = make_assign($1, (AST*)$3);
     }
-    | T_PRINT '(' T_STRING ')' ';'
+  | T_PRINT '(' expr ')' ';'
     {
-        AST *s = make_string($3);
-        $$ = make_print(s, NULL);
+        $$ = make_print($3, NULL);
     }
-    | T_RETURN expr ';'
+  | T_RETURN expr ';'
     {
         $$ = make_return((AST*)$2);
     }
-    | expr ';'
+  | expr ';'
     {
         $$ = $1;
     }
     ;
 
+
 var_decl:
-    T_INTEGER T_IDENT
-    {
-        $$ = make_vardecl($2, NULL);
-    }
+      T_INTEGER T_IDENT
+        { $$ = make_vardecl($2, NULL); }
+
     | T_INTEGER T_IDENT T_ASSIGN expr
-    {
-        $$ = make_vardecl($2, (AST*)$4);
-    }
+        { $$ = make_vardecl($2, $4); }
     ;
 
 expr:
@@ -115,19 +115,23 @@ expr:
     {
         $$ = make_int($1);
     }
-    | T_IDENT
+  | T_STRING
+    {
+        $$ = make_string($1);
+    }
+  | T_IDENT
     {
         $$ = make_ident($1);
     }
-    | expr '*' expr
+  | expr '*' expr
     {
         $$ = make_binary((AST*)$1, '*', (AST*)$3);
     }
-    | expr '+' expr
+  | expr '+' expr
     {
         $$ = make_binary((AST*)$1, '+', (AST*)$3);
     }
-    | '(' expr ')'
+  | '(' expr ')'
     {
         $$ = $2;
     }
@@ -137,5 +141,14 @@ expr:
 
 void yyerror(const char *s)
 {
-    fprintf(stderr, "Parse error: %s\n", s);
+    fprintf(stderr, "Parse error at line %d: %s\n", lineno, s);
 }
+
+int yylex_debug()
+{
+    int t = yylex();
+    printf("[TOKEN] %d\n", t);
+    return t;
+}
+
+#define yylex yylex_debug

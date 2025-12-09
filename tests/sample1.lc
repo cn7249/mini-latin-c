@@ -8,7 +8,16 @@ integer principalis(vacuum)
     MARCUS EST V;
 
     scribere("MARCUS est V");
+    scribere(MARCUS);
+
     scribere("LUCIUS est X");
+    scribere(LUCIUS);
+
+    scribere(MARCUS + LUCIUS);
+
+    MARCUS EST IX;
+
+    scribere(MARCUS);
 
     reditus MARCUS + LUCIUS;
 }

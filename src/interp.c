@@ -58,13 +58,34 @@ static int eval_binary(AST *n) {
     return 0;
 }
 
+static void eval_string(AST *n) {
+    char *s = n->sval;
+    int len = strlen(s);
+
+    if (len >= 2 && s[0] == '"' && s[len - 1] == '"') {
+        char buf[1024];
+        int copy_len = len - 2;
+        if (copy_len > 1023) copy_len = 1023;
+        strncpy(buf, s + 1, copy_len);
+        buf[copy_len] = '\0';
+        printf("%s", buf);
+    } else {
+        printf("%s", s);
+    }
+}
+
 static int eval(AST *n) {
     if (!n) return 0;
+
     switch (n->kind) {
+
         case N_INT:
             return n->ival;
+
         case N_STRING:
+            eval_string(n);
             return 0;
+
         case N_IDENT: {
             int ok;
             int v = get_var(n->sval, &ok);
@@ -74,49 +95,41 @@ static int eval(AST *n) {
             }
             return v;
         }
+
         case N_VARDECL: {
             if (n->left) {
                 int v = eval(n->left);
                 set_var(n->sval, v);
                 return v;
-            } else {
-                set_var(n->sval, 0);
-                return 0;
             }
+            set_var(n->sval, 0);
+            return 0;
         }
+
         case N_ASSIGN: {
             int v = eval(n->left);
             set_var(n->sval, v);
             return v;
         }
+
         case N_BINARY:
             return eval_binary(n);
+
         case N_PRINT: {
             if (n->left) {
                 if (n->left->kind == N_STRING) {
-                    char *s = n->left->sval;
-                    int len = strlen(s);
-
-                    if (len >= 2 && s[0] == '"' && s[len - 1] == '"') {
-                        char buf[1024];
-                        int copy_len = len - 2;
-                        if (copy_len > 1023) copy_len = 1023;
-
-                        strncpy(buf, s + 1, copy_len);
-                        buf[copy_len] = '\0';
-
-                        printf("%s\n", buf);
-                    } else {
-                        printf("%s\n", s);
-                    }
+                    eval_string(n->left);
+                    printf("\n");
                 } else {
                     printf("%d\n", eval(n->left));
                 }
             }
             return 0;
         }
+
         case N_RETURN:
             return eval(n->left);
+
         default:
             return 0;
     }
