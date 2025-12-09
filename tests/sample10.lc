@@ -1,0 +1,28 @@
+Ave Imperator, morituri te salutant.
+
+integer principalis(vacuum)
+{
+    integer A EST X;
+    integer B EST V;
+
+    NOTA: simple computation
+    scribere(A + B);
+
+    scribere(A PAR B);
+    scribere(A IMPAR B);
+
+    scribere(A MAIOR B);
+    scribere(A NON_MAIOR B);
+
+    scribere((A MAIOR B) ET (B PAR V));
+    scribere((A MINOR B) VEL (A PAR V));
+
+    scribere(NON (A PAR B));
+
+    EXPLANATIO:
+    this should be ignored.
+    I love compiler class.
+    FINIS
+
+    reditus 0;
+}

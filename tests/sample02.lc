@@ -1,0 +1,12 @@
+Ave Imperator, morituri te salutant.
+
+integer principalis(vacuum)
+{
+    integer A EST V;
+    integer B EST X;
+
+    scribere(A + B);
+    scribere(A * B);
+
+    reditus 0;
+}

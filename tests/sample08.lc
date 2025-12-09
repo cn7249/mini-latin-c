@@ -1,0 +1,12 @@
+Ave Imperator, morituri te salutant.
+
+integer principalis(vacuum)
+{
+    NOTA: this line should be ignored
+
+    integer A EST X;
+
+    scribere(A);
+
+    reditus 0;
+}

@@ -1,0 +1,9 @@
+Ave Imperator, morituri te salutant.
+
+integer principalis(vacuum)
+{
+    scribere("SALVE MUNDUS");
+    scribere("VALDE BENE!");
+
+    reditus 0;
+}

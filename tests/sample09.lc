@@ -1,0 +1,15 @@
+Ave Imperator, morituri te salutant.
+
+integer principalis(vacuum)
+{
+    EXPLANATIO:
+        nothing inside this block should be executed
+        integer A EST V;
+        scribere(A);
+    FINIS
+
+    integer B EST X;
+    scribere(B);
+
+    reditus 0;
+}
