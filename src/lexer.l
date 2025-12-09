@@ -18,7 +18,7 @@ int roman_to_int(const char *s);
 
 %%
 
-"//"[^\n]*      ;
+"NOTA!"[^\n]*      ;
 
 \n                  { lineno++; }
 [ \t\r]+            ;
