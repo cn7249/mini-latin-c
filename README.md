@@ -472,8 +472,6 @@ integer principalis(vacuum)
 
 **Output**
 ```
-
-```
 15
 0
 1
@@ -482,6 +480,7 @@ integer principalis(vacuum)
 1
 0
 1
+```
 
 ---
 
