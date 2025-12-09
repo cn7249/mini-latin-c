@@ -94,7 +94,21 @@ static int eval(AST *n) {
         case N_PRINT: {
             if (n->left) {
                 if (n->left->kind == N_STRING) {
-                    printf("%s\n", n->left->sval);
+                    char *s = n->left->sval;
+                    int len = strlen(s);
+
+                    if (len >= 2 && s[0] == '"' && s[len - 1] == '"') {
+                        char buf[1024];
+                        int copy_len = len - 2;
+                        if (copy_len > 1023) copy_len = 1023;
+
+                        strncpy(buf, s + 1, copy_len);
+                        buf[copy_len] = '\0';
+
+                        printf("%s\n", buf);
+                    } else {
+                        printf("%s\n", s);
+                    }
                 } else {
                     printf("%d\n", eval(n->left));
                 }
